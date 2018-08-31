@@ -1,0 +1,60 @@
+{% extends admin_base_template %}
+
+ {% block page_body %}
+
+    <div class="container-fluid">
+        <h1>ISPyB Database Administration</h1>
+        
+        <div class="row">
+            <div class="col-md-2">
+
+              <nav class="navbar" role="navigation">
+              <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                  </button>
+<!--                   {% block brand %}
+                  <a class="navbar-brand" href="#">{{ admin_view.admin.name }}</a>
+                  {% endblock %}
+ -->                </div>
+                <!-- navbar content -->
+                    <div class="collapse navbar-collapse" id="admin-navbar-collapse">
+                      {% block main_menu %}
+                      <ul class="nav nav-pills nav-stacked">
+                        {{ layout.menu() }}
+                      </ul>
+                      {% endblock %}
+
+                      {% block menu_links %}
+                      <ul class="nav navbar-right">
+                        {{ layout.menu_links() }}
+                      </ul>
+                      {% endblock %}
+                      {% block access_control %}
+                      {% endblock %}
+                    </div>
+              </nav>
+        </div> <!-- end col -->
+        <div class="col-md-10">
+
+          {% block messages %}
+          {{ layout.messages() }}
+          {% endblock %}
+
+          {% set render_ctx = h.resolve_ctx() %}
+
+        {% block body %}{% endblock %}
+    
+        </div> <!-- end col -->
+    </div> <!-- end row -->
+
+
+</div>
+    
+
+{% endblock %}
+    
