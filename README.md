@@ -28,12 +28,12 @@ There is a basic auth included - credentials are generated on startup (check con
 To recreate the database models you can use sqlacodegen
 
 ## Install sqlacodegen
-pip install 'sqlacodegen <= 2.0.0'
+`pip install 'sqlacodegen <= 2.0.0'`
 
 (Version 2.0.0 upwards has issues with VARCHAR length)
 
 ## Generate models
-sqlacodegen mysql://<user>:<password>@<host>/<db_name> --outfile gen_models.py
+`sqlacodegen mysql://<user>:<password>@<host>/<db_name> --outfile gen_models.py`
 
 Then compare the generated models with ispyb/models.py
 
@@ -42,13 +42,13 @@ Some changes are required to fit the models file into flask SQLAlchemy conventio
 From newly generated file:
 
 Changes to models.py:
-- from sqlalchemy.ext.declarative import declarative_base
-- Base = declarative_base() 
-- metadata = Base.metadata
-+ from . import Base
-replace metadata with Base.metadata
+`- from sqlalchemy.ext.declarative import declarative_base`
+`- Base = declarative_base()` 
+`- metadata = Base.metadata`
+`+ from . import Base`
+replace `metadata with Base.metadata`
 
 ## Check model list is consistent
-grep '(Base)' gen_models.py | sed s'/class //' | sed s'/(Base)://'
+`grep '(Base)' gen_models.py | sed s'/class //' | sed s'/(Base)://'`
 
 Add these to a model_list.py file within ispyb directory (replace existing one)
