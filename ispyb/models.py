@@ -523,6 +523,9 @@ class BLSession(Base):
     Proposal = relationship(u'Proposal')
     Shipping = relationship(u'Shipping', secondary='ShippingHasSession')
 
+    def __str__(self):
+        return "{}{}-{}".format(self.Proposal.proposalCode, self.Proposal.proposalNumber, self.visit_number)
+
 
 class BLSessionHasSCPosition(Base):
     __tablename__ = 'BLSession_has_SCPosition'
@@ -2029,6 +2032,8 @@ class Person(Base):
     UserGroup = relationship(u'UserGroup', secondary='UserGroup_has_Person')
     Project = relationship(u'Project', secondary='Project_has_Person')
 
+    def __str__(self):
+        return "{}, {}: {}".format(self.familyName, self.givenName, self.login)
 
 class Phasing(Base):
     __tablename__ = 'Phasing'
