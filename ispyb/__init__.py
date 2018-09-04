@@ -25,12 +25,10 @@ except ImportError:
     db_url = 'mysql://ispyb:integration@192.168.33.11:3306/ispyb'
 
 
-"""
-Initialise the database connection and flask-sqlalchemy
-"""
-
-
 def init_app(app):
+    """
+    Initialise the database connection and flask-sqlalchemy
+    """
     print("Using database connection URL: {}".format(db_url))
 
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
