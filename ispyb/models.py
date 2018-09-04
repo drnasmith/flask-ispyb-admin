@@ -1670,7 +1670,7 @@ class Laboratory(Base):
     url = Column(String(255))
     organization = Column(String(45))
     recordTimeStamp = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
-    laboratoryPk = Column(Integer)
+#    laboratoryPk = Column(Integer)
     postcode = Column(String(15))
 
 
