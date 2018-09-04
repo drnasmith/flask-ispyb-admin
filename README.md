@@ -13,11 +13,11 @@ If on python < 3.4 than also
  - enum34
 
 ## Running
-Edit config module to reflect credentials
+Create/edit config.py module to reflect credentials (see ispyb/__init__.py for format)
 
-$ python app.py
+`python app.py`
 
-http://localhost:9000/admin 
+View in browser, http://localhost:9000/admin 
 
 ## Security
 This is not a secure app and is only intended to run on development systems.
@@ -42,11 +42,11 @@ Some changes are required to fit the models file into flask SQLAlchemy conventio
 From newly generated file:
 
 Changes to models.py:
-`- from sqlalchemy.ext.declarative import declarative_base`
-`- Base = declarative_base()` 
-`- metadata = Base.metadata`
-`+ from . import Base`
-replace `metadata with Base.metadata`
+- `- from sqlalchemy.ext.declarative import declarative_base`
+- `- Base = declarative_base()` 
+- `- metadata = Base.metadata`
+- `+ from . import Base`
+- replace `metadata with Base.metadata`
 
 ## Check model list is consistent
 `grep '(Base)' gen_models.py | sed s'/class //' | sed s'/(Base)://'`
