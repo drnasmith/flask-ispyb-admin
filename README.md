@@ -21,6 +21,34 @@ http://localhost:9000/admin
 
 ## Security
 This is not a secure app and is only intended to run on development systems.
-There is a basic auth included - edit credentials in the app (or get from env vars)
+There is a basic auth included - credentials are generated on startup (check console)
 
 
+# Setup/Update models
+To recreate the database models you can use sqlacodegen
+
+## Install sqlacodegen
+pip install 'sqlacodegen <= 2.0.0'
+
+(Version 2.0.0 upwards has issues with VARCHAR length)
+
+## Generate models
+sqlacodegen mysql://<user>:<password>@<host>/<db_name> --outfile gen_models.py
+
+Then compare the generated models with ispyb/models.py
+
+Some changes are required to fit the models file into flask SQLAlchemy conventions.
+
+From newly generated file:
+
+Changes to models.py:
+- from sqlalchemy.ext.declarative import declarative_base
+- Base = declarative_base() 
+- metadata = Base.metadata
++ from . import Base
+replace metadata with Base.metadata
+
+## Check model list is consistent
+grep '(Base)' gen_models.py | sed s'/class //' | sed s'/(Base)://'
+
+Add these to a model_list.py file within ispyb directory (replace existing one)

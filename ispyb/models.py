@@ -369,6 +369,7 @@ class BLSample(Base):
     blottingForce = Column(Float)
     blottingDrainTime = Column(Integer)
     support = Column(String(50))
+    subLocation = Column(SmallInteger)
 
     BLSubSample = relationship(u'BLSubSample', primaryjoin='BLSample.blSubSampleId == BLSubSample.blSubSampleId')
     Container = relationship(u'Container')
@@ -568,7 +569,7 @@ class BeamAperture(Base):
     y = Column(Float)
     apertureSize = Column(SmallInteger)
 
-    BeamlineStat = relationship(u'BeamlineStat')
+    BeamlineStat = relationship('BeamlineStat')
 
 
 class BeamCalendar(Base):
@@ -590,13 +591,14 @@ class BeamCentre(Base):
     y = Column(Float)
     zoom = Column(Integer)
 
-    BeamlineStat = relationship(u'BeamlineStat')
+    BeamlineStat = relationship('BeamlineStat')
 
 
 class BeamLineSetup(Base):
     __tablename__ = 'BeamLineSetup'
 
     beamLineSetupId = Column(Integer, primary_key=True)
+    detectorId = Column(ForeignKey(u'Detector.detectorId'), index=True)
     synchrotronMode = Column(String(255))
     undulatorType1 = Column(String(45))
     undulatorType2 = Column(String(45))
@@ -610,13 +612,39 @@ class BeamLineSetup(Base):
     setupDate = Column(DateTime)
     synchrotronName = Column(String(255))
     maxExpTimePerDataCollection = Column(Float(asdecimal=True))
+    maxExposureTimePerImage = Column(Float)
     minExposureTimePerImage = Column(Float(asdecimal=True))
     goniostatMaxOscillationSpeed = Column(Float(asdecimal=True))
+    goniostatMaxOscillationWidth = Column(Float(asdecimal=True))
     goniostatMinOscillationWidth = Column(Float(asdecimal=True))
+    maxTransmission = Column(Float(asdecimal=True))
     minTransmission = Column(Float(asdecimal=True))
     recordTimeStamp = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     CS = Column(Float)
     beamlineName = Column(String(50))
+    beamSizeXMin = Column(Float)
+    beamSizeXMax = Column(Float)
+    beamSizeYMin = Column(Float)
+    beamSizeYMax = Column(Float)
+    energyMin = Column(Float)
+    energyMax = Column(Float)
+    omegaMin = Column(Float)
+    omegaMax = Column(Float)
+    kappaMin = Column(Float)
+    kappaMax = Column(Float)
+    phiMin = Column(Float)
+    phiMax = Column(Float)
+    active = Column(Integer, nullable=False, server_default=text("'0'"))
+    numberOfImagesMax = Column(Integer)
+    numberOfImagesMin = Column(Integer)
+    boxSizeXMin = Column(Float(asdecimal=True))
+    boxSizeXMax = Column(Float(asdecimal=True))
+    boxSizeYMin = Column(Float(asdecimal=True))
+    boxSizeYMax = Column(Float(asdecimal=True))
+    monoBandwidthMin = Column(Float(asdecimal=True))
+    monoBandwidthMax = Column(Float(asdecimal=True))
+
+    Detector = relationship(u'Detector')
 
 
 class BeamlineAction(Base):
@@ -746,6 +774,12 @@ class ComponentType(Base):
     componentTypeId = Column(Integer, primary_key=True)
     name = Column(String(31), nullable=False)
 
+
+t_Component_has_SubType = Table(
+    'Component_has_SubType', Base.metadata,
+    Column('componentId', ForeignKey(u'Protein.proteinId', ondelete=u'CASCADE'), primary_key=True, nullable=False),
+    Column('componentSubTypeId', ForeignKey(u'ComponentSubType.componentSubTypeId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False, index=True)
+)
 
 
 class ConcentrationType(Base):
@@ -980,6 +1014,7 @@ class DataCollection(Base):
     imageDirectory = Column(String(255), index=True)
     imagePrefix = Column(String(45), index=True)
     imageSuffix = Column(String(45))
+    imageContainerSubPath = Column(String(255))
     fileTemplate = Column(String(255))
     wavelength = Column(Float)
     resolution = Column(Float)
@@ -1018,19 +1053,19 @@ class DataCollection(Base):
     ACTUALCONTAINERSLOTINSC = Column(Integer)
     actualCenteringPosition = Column(String(255))
     beamShape = Column(String(45))
-    dataCollectionGroupId = Column(ForeignKey(u'DataCollectionGroup.dataCollectionGroupId', ondelete=u'CASCADE', onupdate=u'CASCADE'), nullable=False, index=True)
+    dataCollectionGroupId = Column(ForeignKey(u'DataCollectionGroup.dataCollectionGroupId'), nullable=False, index=True)
     POSITIONID = Column(Integer)
-    detectorId = Column(ForeignKey(u'Detector.detectorId', ondelete=u'CASCADE', onupdate=u'CASCADE'), index=True)
+    detectorId = Column(ForeignKey(u'Detector.detectorId'), index=True)
     FOCALSPOTSIZEATSAMPLEX = Column(Float)
     POLARISATION = Column(Float)
     FOCALSPOTSIZEATSAMPLEY = Column(Float)
     APERTUREID = Column(Integer)
     screeningOrigId = Column(Integer)
-    startPositionId = Column(ForeignKey(u'MotorPosition.motorPositionId', ondelete=u'CASCADE', onupdate=u'CASCADE'), index=True)
-    endPositionId = Column(ForeignKey(u'MotorPosition.motorPositionId', ondelete=u'CASCADE', onupdate=u'CASCADE'), index=True)
+    startPositionId = Column(ForeignKey(u'MotorPosition.motorPositionId'), index=True)
+    endPositionId = Column(ForeignKey(u'MotorPosition.motorPositionId'), index=True)
     flux = Column(Float(asdecimal=True))
-    strategySubWedgeOrigId = Column(ForeignKey(u'ScreeningStrategySubWedge.screeningStrategySubWedgeId', ondelete=u'CASCADE', onupdate=u'CASCADE'), index=True)
-    blSubSampleId = Column(ForeignKey(u'BLSubSample.blSubSampleId', ondelete=u'CASCADE', onupdate=u'CASCADE'), index=True)
+    strategySubWedgeOrigId = Column(ForeignKey(u'ScreeningStrategySubWedge.screeningStrategySubWedgeId'), index=True)
+    blSubSampleId = Column(ForeignKey(u'BLSubSample.blSubSampleId'), index=True)
     flux_end = Column(Float(asdecimal=True))
     bestWilsonPlotPath = Column(String(255))
     processedDataFile = Column(String(255))
@@ -1091,7 +1126,7 @@ class DataCollectionFileAttachment(Base):
     dataCollectionFileAttachmentId = Column(Integer, primary_key=True)
     dataCollectionId = Column(ForeignKey(u'DataCollection.dataCollectionId', ondelete=u'CASCADE', onupdate=u'CASCADE'), nullable=False, index=True)
     fileFullPath = Column(String(255), nullable=False)
-    fileType = Column(ENUM(u'snapshot', u'log', u'xy', u'recip'))
+    fileType = Column(ENUM(u'snapshot', u'log', u'xy', u'recip', u'pia', u'warning'))
     createTime = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
     DataCollection = relationship(u'DataCollection')
@@ -1104,7 +1139,7 @@ class DataCollectionGroup(Base):
     sessionId = Column(ForeignKey(u'BLSession.sessionId', ondelete=u'CASCADE', onupdate=u'CASCADE'), nullable=False, index=True)
     comments = Column(String(1024))
     blSampleId = Column(ForeignKey(u'BLSample.blSampleId', ondelete=u'CASCADE', onupdate=u'CASCADE'), index=True)
-    experimentType = Column(ENUM(u'SAD', u'SAD - Inverse Beam', u'OSC', u'Collect - Multiwedge', u'MAD', u'Helical', u'Multi-positional', u'Mesh', u'Burn', u'MAD - Inverse Beam', u'Characterization', u'Dehydration', u'tomo', u'experiment', u'EM', u'PDF', u'PDF+Bragg', u'Bragg', u'single particle'))
+    experimentType = Column(ENUM(u'SAD', u'SAD - Inverse Beam', u'OSC', u'Collect - Multiwedge', u'MAD', u'Helical', u'Multi-positional', u'Mesh', u'Burn', u'MAD - Inverse Beam', u'Characterization', u'Dehydration', u'tomo', u'experiment', u'EM', u'PDF', u'PDF+Bragg', u'Bragg', u'single particle', u'Serial Fixed', u'Serial Jet'))
     startTime = Column(DateTime)
     endTime = Column(DateTime)
     crystalClass = Column(String(20))
@@ -1177,6 +1212,8 @@ class Detector(Base):
     composition = Column(String(16))
     numberOfPixelsX = Column(Integer)
     numberOfPixelsY = Column(Integer)
+    detectorRollMin = Column(Float(asdecimal=True))
+    detectorRollMax = Column(Float(asdecimal=True))
 
 
 class Dewar(Base):
@@ -1522,9 +1559,10 @@ class Image(Base):
 class ImageQualityIndicator(Base):
     __tablename__ = 'ImageQualityIndicators'
 
-    imageQualityIndicatorsId = Column(Integer, primary_key=True)
-    imageId = Column(Integer, index=True)
-    autoProcProgramId = Column(ForeignKey(u'AutoProcProgram.autoProcProgramId', ondelete=u'CASCADE', onupdate=u'CASCADE'), index=True)
+    dataCollectionId = Column(Integer, primary_key=True, nullable=False)
+    imageNumber = Column(Integer, primary_key=True, nullable=False)
+    imageId = Column(Integer)
+    autoProcProgramId = Column(Integer)
     spotTotal = Column(Integer)
     inResTotal = Column(Integer)
     goodBraggCandidates = Column(Integer)
@@ -1538,12 +1576,7 @@ class ImageQualityIndicator(Base):
     recordTimeStamp = Column(DateTime)
     totalIntegratedSignal = Column(Float(asdecimal=True))
     dozor_score = Column(Float(asdecimal=True))
-    dataCollectionId = Column(ForeignKey(u'DataCollection.dataCollectionId'), index=True)
-    imageNumber = Column(Integer)
     driftFactor = Column(Float)
-
-    AutoProcProgram = relationship(u'AutoProcProgram')
-    DataCollection = relationship(u'DataCollection')
 
 
 class Imager(Base):
@@ -1735,7 +1768,7 @@ class Measurement(Base):
     measurementId = Column(Integer, primary_key=True)
 
     Run = relationship(u'Run')
-    Speciman = relationship(u'Speciman')
+    Speciman = relationship('Speciman')
 
 
 class MeasurementToDataCollection(Base):
@@ -1800,7 +1833,7 @@ class ModelBuilding(Base):
     highRes = Column(Float(asdecimal=True))
     recordTimeStamp = Column(DateTime)
 
-    PhasingAnalysi = relationship(u'PhasingAnalysi')
+    PhasingAnalysi = relationship('PhasingAnalysi')
     PhasingProgramRun = relationship(u'PhasingProgramRun')
     SpaceGroup = relationship(u'SpaceGroup')
 
@@ -1845,9 +1878,11 @@ class MotionCorrection(Base):
     fftFullPath = Column(String(255))
     fftCorrectedFullPath = Column(String(255))
     comments = Column(String(255))
+    movieId = Column(ForeignKey(u'Movie.movieId'), index=True)
 
     AutoProcProgram = relationship(u'AutoProcProgram')
     DataCollection = relationship(u'DataCollection')
+    Movie = relationship(u'Movie')
 
 
 class MotionCorrectionDrift(Base):
@@ -1878,6 +1913,21 @@ class MotorPosition(Base):
     gridIndexY = Column(Integer)
     gridIndexZ = Column(Integer)
     recordTimeStamp = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+
+
+class Movie(Base):
+    __tablename__ = 'Movie'
+
+    movieId = Column(Integer, primary_key=True)
+    dataCollectionId = Column(ForeignKey(u'DataCollection.dataCollectionId'), index=True)
+    movieNumber = Column(Integer)
+    movieFullPath = Column(String(255))
+    createdTimeStamp = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
+    positionX = Column(Float)
+    positionY = Column(Float)
+    nominalDefocus = Column(Float)
+
+    DataCollection = relationship(u'DataCollection')
 
 
 class PDB(Base):
@@ -1994,7 +2044,7 @@ class Phasing(Base):
     highRes = Column(Float(asdecimal=True))
     recordTimeStamp = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
 
-    PhasingAnalysi = relationship(u'PhasingAnalysi')
+    PhasingAnalysi = relationship('PhasingAnalysi')
     PhasingProgramRun = relationship(u'PhasingProgramRun')
     SpaceGroup = relationship(u'SpaceGroup')
 
@@ -2086,7 +2136,7 @@ class PhasingHasScaling(Base):
     recordTimeStamp = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
 
     AutoProcScaling = relationship(u'AutoProcScaling')
-    PhasingAnalysi = relationship(u'PhasingAnalysi')
+    PhasingAnalysi = relationship('PhasingAnalysi')
 
 
 class PlateGroup(Base):
@@ -2137,7 +2187,7 @@ class PreparePhasingDatum(Base):
     highRes = Column(Float(asdecimal=True))
     recordTimeStamp = Column(DateTime)
 
-    PhasingAnalysi = relationship(u'PhasingAnalysi')
+    PhasingAnalysi = relationship('PhasingAnalysi')
     PhasingProgramRun = relationship(u'PhasingProgramRun')
     SpaceGroup = relationship(u'SpaceGroup')
 
@@ -2196,6 +2246,54 @@ class Project(Base):
     BLSession = relationship(u'BLSession', secondary='Project_has_Session')
 
 
+t_Project_has_BLSample = Table(
+    'Project_has_BLSample', Base.metadata,
+    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False),
+    Column('blSampleId', ForeignKey(u'BLSample.blSampleId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False, index=True)
+)
+
+
+t_Project_has_DCGroup = Table(
+    'Project_has_DCGroup', Base.metadata,
+    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False),
+    Column('dataCollectionGroupId', ForeignKey(u'DataCollectionGroup.dataCollectionGroupId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False, index=True)
+)
+
+
+t_Project_has_EnergyScan = Table(
+    'Project_has_EnergyScan', Base.metadata,
+    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False),
+    Column('energyScanId', ForeignKey(u'EnergyScan.energyScanId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False, index=True)
+)
+
+
+t_Project_has_Person = Table(
+    'Project_has_Person', Base.metadata,
+    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE'), primary_key=True, nullable=False),
+    Column('personId', ForeignKey(u'Person.personId', ondelete=u'CASCADE'), primary_key=True, nullable=False, index=True)
+)
+
+
+t_Project_has_Protein = Table(
+    'Project_has_Protein', Base.metadata,
+    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE'), primary_key=True, nullable=False),
+    Column('proteinId', ForeignKey(u'Protein.proteinId', ondelete=u'CASCADE'), primary_key=True, nullable=False, index=True)
+)
+
+
+t_Project_has_Session = Table(
+    'Project_has_Session', Base.metadata,
+    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False),
+    Column('sessionId', ForeignKey(u'BLSession.sessionId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False, index=True)
+)
+
+
+t_Project_has_Shipping = Table(
+    'Project_has_Shipping', Base.metadata,
+    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE'), primary_key=True, nullable=False),
+    Column('shippingId', ForeignKey(u'Shipping.shippingId', ondelete=u'CASCADE'), primary_key=True, nullable=False, index=True)
+)
+
 
 class ProjectHasUser(Base):
     __tablename__ = 'Project_has_User'
@@ -2205,6 +2303,13 @@ class ProjectHasUser(Base):
     username = Column(String(15))
 
     Project = relationship(u'Project')
+
+
+t_Project_has_XFEFSpectrum = Table(
+    'Project_has_XFEFSpectrum', Base.metadata,
+    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE'), primary_key=True, nullable=False),
+    Column('xfeFluorescenceSpectrumId', ForeignKey(u'XFEFluorescenceSpectrum.xfeFluorescenceSpectrumId', ondelete=u'CASCADE'), primary_key=True, nullable=False, index=True)
+)
 
 
 class Proposal(Base):
@@ -2618,6 +2723,7 @@ class ScreeningOutput(Base):
     rFriedel = Column(Float(asdecimal=True))
     indexingSuccess = Column(Integer, nullable=False, server_default=text("'0'"))
     strategySuccess = Column(Integer, nullable=False, server_default=text("'0'"))
+    alignmentSuccess = Column(Integer, nullable=False, server_default=text("'0'"))
 
     Screening = relationship(u'Screening')
 
@@ -2798,6 +2904,13 @@ class Shipping(Base):
     LabContact1 = relationship(u'LabContact', primaryjoin='Shipping.sendingLabContactId == LabContact.labContactId')
 
 
+t_ShippingHasSession = Table(
+    'ShippingHasSession', Base.metadata,
+    Column('shippingId', ForeignKey(u'Shipping.shippingId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False, index=True),
+    Column('sessionId', ForeignKey(u'BLSession.sessionId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False, index=True)
+)
+
+
 class SpaceGroup(Base):
     __tablename__ = 'SpaceGroup'
 
@@ -2897,7 +3010,7 @@ class SubstructureDetermination(Base):
     highRes = Column(Float(asdecimal=True))
     recordTimeStamp = Column(DateTime)
 
-    PhasingAnalysi = relationship(u'PhasingAnalysi')
+    PhasingAnalysi = relationship('PhasingAnalysi')
     PhasingProgramRun = relationship(u'PhasingProgramRun')
     SpaceGroup = relationship(u'SpaceGroup')
 
@@ -3302,69 +3415,4 @@ t_v_week = Table(
 t_v_weekDay = Table(
     'v_weekDay', Base.metadata,
     Column('day', String(10))
-)
-
-t_Project_has_EnergyScan = Table(
-    'Project_has_EnergyScan', Base.metadata,
-    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False),
-    Column('energyScanId', ForeignKey(u'EnergyScan.energyScanId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False, index=True)
-)
-
-t_Project_has_BLSample = Table(
-    'Project_has_BLSample', Base.metadata,
-    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False),
-    Column('blSampleId', ForeignKey(u'BLSample.blSampleId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False, index=True)
-)
-
-
-t_Project_has_DCGroup = Table(
-    'Project_has_DCGroup', Base.metadata,
-    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False),
-    Column('dataCollectionGroupId', ForeignKey(u'DataCollectionGroup.dataCollectionGroupId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False, index=True)
-)
-
-
-
-t_Project_has_Person = Table(
-    'Project_has_Person', Base.metadata,
-    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE'), primary_key=True, nullable=False),
-    Column('personId', ForeignKey(u'Person.personId', ondelete=u'CASCADE'), primary_key=True, nullable=False, index=True)
-)
-
-
-t_Project_has_Protein = Table(
-    'Project_has_Protein', Base.metadata,
-    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE'), primary_key=True, nullable=False),
-    Column('proteinId', ForeignKey(u'Protein.proteinId', ondelete=u'CASCADE'), primary_key=True, nullable=False, index=True)
-)
-
-
-t_Project_has_Session = Table(
-    'Project_has_Session', Base.metadata,
-    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False),
-    Column('sessionId', ForeignKey(u'BLSession.sessionId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False, index=True)
-)
-
-
-t_Project_has_Shipping = Table(
-    'Project_has_Shipping', Base.metadata,
-    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE'), primary_key=True, nullable=False),
-    Column('shippingId', ForeignKey(u'Shipping.shippingId', ondelete=u'CASCADE'), primary_key=True, nullable=False, index=True)
-)
-
-t_Component_has_SubType = Table(
-    'Component_has_SubType', Base.metadata,
-    Column('componentId', ForeignKey(u'Protein.proteinId', ondelete=u'CASCADE'), primary_key=True, nullable=False),
-    Column('componentSubTypeId', ForeignKey(u'ComponentSubType.componentSubTypeId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False, index=True)
-)
-
-t_Project_has_XFEFSpectrum = Table(
-    'Project_has_XFEFSpectrum', Base.metadata,
-    Column('projectId', ForeignKey(u'Project.projectId', ondelete=u'CASCADE'), primary_key=True, nullable=False),
-    Column('xfeFluorescenceSpectrumId', ForeignKey(u'XFEFluorescenceSpectrum.xfeFluorescenceSpectrumId', ondelete=u'CASCADE'), primary_key=True, nullable=False, index=True)
-)
-t_ShippingHasSession = Table(
-    'ShippingHasSession', Base.metadata,
-    Column('shippingId', ForeignKey(u'Shipping.shippingId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False, index=True),
-    Column('sessionId', ForeignKey(u'BLSession.sessionId', ondelete=u'CASCADE', onupdate=u'CASCADE'), primary_key=True, nullable=False, index=True)
 )
