@@ -1218,6 +1218,8 @@ class Detector(Base):
     detectorRollMin = Column(Float(asdecimal=True))
     detectorRollMax = Column(Float(asdecimal=True))
 
+    def __str__(self):
+        return "{} {}".format(self.detectorManufacturer, self.detectorModel)
 
 class Dewar(Base):
     __tablename__ = 'Dewar'
