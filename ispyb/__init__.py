@@ -15,14 +15,14 @@ Base = db.Model
 try:
     from config import db_config
 
-    db_url = URL(drivername='mysql',
+    db_url = URL(drivername='mysql+pymysql',
                  username=db_config.get('user'),
                  password=db_config.get('password'),
                  host=db_config.get('host'),
                  port=db_config.get('port'),
                  database=db_config.get('name'))
 except ImportError:
-    db_url = 'mysql://ispyb:integration@192.168.33.11:3306/ispyb'
+    db_url = 'mysql+pymysql://ispyb:integration@192.168.33.11:3306/ispyb'
 
 
 def init_app(app):
