@@ -2336,6 +2336,8 @@ class Proposal(Base):
 
     Person = relationship(u'Person')
 
+    def __str__(self):
+        return "{}".format(self.title)
 
 class ProposalHasPerson(Base):
     __tablename__ = 'ProposalHasPerson'
