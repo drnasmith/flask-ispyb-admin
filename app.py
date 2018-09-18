@@ -20,6 +20,8 @@ def generate_password():
         index = random.randrange(len(characters))
         mypassword = mypassword + characters[index]
 
+    print("Generated Password for this session: {}".format(mypassword))
+
     return mypassword
 
 # Using basic authorisation to protect page
@@ -40,5 +42,4 @@ def index():
     return render_template('test.html')
 
 if __name__ == '__main__':
-    print("Password: {}".format(app.config['BASIC_AUTH_PASSWORD']))
-    app.run(debug=True, port=9000)
+    app.run(debug=True)
