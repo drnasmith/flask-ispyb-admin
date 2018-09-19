@@ -37,9 +37,9 @@ app.secret_key = b'_5asdadf#y2L"F4Q8z\n\xec]/'
 ispyb.init_app(app)
 admin.init_app(app)
 
-@app.route('/ispyb')
+@app.route('/')
 def index():
-    return render_template('test.html')
+    return render_template('index.html', db_url=app.config['SQLALCHEMY_DATABASE_URI'])
 
 if __name__ == '__main__':
     app.run(debug=True)
