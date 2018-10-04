@@ -15,7 +15,7 @@ Base = db.Model
 try:
     from config import db_config
 
-    db_url = URL(drivername='mysql+pymysql',
+    db_url = URL(drivername='mysql+mysqlconnector',
                  username=db_config.get('user'),
                  password=db_config.get('password'),
                  host=db_config.get('host'),
