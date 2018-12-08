@@ -22,7 +22,7 @@ try:
                  port=db_config.get('port'),
                  database=db_config.get('name'))
 except ImportError:
-    db_url = 'mysql+pymysql://ispyb:integration@192.168.33.11:3306/ispyb'
+    db_url = 'mysql+mysqlconnector://ispyb:integration@192.168.33.11:3306/ispyb'
 
 
 def init_app(app):
