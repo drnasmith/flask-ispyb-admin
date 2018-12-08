@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-conn = 'mysql://ispyb:integration@192.168.33.11:3306/ispyb'
+conn = 'mysql+mysqlconnector://ispyb:integration@192.168.33.10:3306/ispyb'
 
 engine = create_engine(conn)
 Session = sessionmaker(bind=engine)
@@ -41,9 +41,9 @@ def test_inspections(iid=0):
         print inspection.inspectionTypeId
 
 
-#test_persons()
-#test_sessions()
-test_inspections(1)
-test_inspections(2)
-test_inspections(3)
+test_persons()
+test_sessions()
+#test_inspections(1)
+#test_inspections(2)
+#test_inspections(3)
 
