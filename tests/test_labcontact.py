@@ -59,7 +59,7 @@ def get_id(session, params):
     Parameters:
       params - dictionary of params obj
     """
-    query = session.query(models.Person).filter(models.LabContact.cardName == params["card_name"])
+    query = session.query(models.LabContact).filter(models.LabContact.cardName == params["card_name"])
     labcontact = query.one()
 
     return labcontact.labContactId
