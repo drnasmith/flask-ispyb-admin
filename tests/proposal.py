@@ -33,22 +33,21 @@ def create(session, params):
 
 def remove_all(session):
     """
-    Remove test proposal and all related tables 
+    Remove all proposals and related tables 
     using cascading delete in DB
 
     parameters:
       session - SQLAlchemy session object
-      proposal_id - proposal id (primary key)
     """
-    for id in proposals:        
-        try:
-            proposal = session.query(models.Proposal).get(id)
+    try:
+        proposals = session.query(models.Proposal)
+        for proposal in proposals:
             session.delete(proposal)
-            session.commit()
-        except UnmappedInstanceError:
-            print("Error - proposal not found {}".format(id))
-        except IntegrityError:
-            print("IntegrityError - can't remove proposal {}".format(id))
+        session.commit()
+    except UnmappedInstanceError:
+        print("Error - proposal not found {}".format(id))
+    except IntegrityError:
+        print("IntegrityError - can't remove proposal {}".format(id))
 
 def get_id(session, proposal_code, proposal_number):
     prop = session.query(models.Proposal).filter(models.Proposal.proposalCode == proposal_code, models.Proposal.proposalNumber == proposal_number).one()
