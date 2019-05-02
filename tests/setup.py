@@ -1,9 +1,11 @@
 import os
 import datetime
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import UnmappedInstanceError
+from sqlalchemy.engine.url import URL
 
 from ispyb import models
 
@@ -20,9 +22,20 @@ def create_db_session():
     """
     Generate a SQLAlchemy session object
     """
-    conn = 'mysql+mysqlconnector://ispyb:integration@192.168.33.11:3306/ispyb'
+    try:
+        from config import db_config
+
+        db_url = URL(drivername='mysql+mysqlconnector',
+                 username=db_config.get('user'),
+                 password=db_config.get('password'),
+                 host=db_config.get('host'),
+                 port=db_config.get('port'),
+                 database=db_config.get('name'))
+    except ImportError:
+        db_url = 'mysql+mysqlconnector://ispyb:integration@192.168.33.11:3306/ispyb'
     
-    engine = create_engine(conn)
+    print("Creating db connection to {}".format(db_url))
+    engine = create_engine(db_url)
 
     Session = sessionmaker(bind=engine)
     session = Session()
